@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ネットワーク接続拠点一覧</title>
+  <meta charset="utf-8">
+  <meta name="description" content="ネットワーク接続拠点一覧">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-Control" content="no-cache">
+
+  <!-- CSS -->
+  <link href="css/font-awesome.min.css" rel="stylesheet">
+
+  <!-- script -->
+  <script type="text/javascript" src="js/vue.min.js"></script>
+  <script type="text/javascript" src="js/axios.min.js"></script>
+  <script type="text/javascript" src="js/polyfill.min.js"></script>
+
+</head>
+
+<body>
+  <!-- Style -->
+  <style type="text/css" scoped="scoped">
+    /*<![CDATA[*/
+
+    html {
+      overflow-y: scroll;
+    }
+
+    body {
+      color: #666;
+      font-size: 14px;
+      font-family: "Meiryo UI", "Meiryo", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", "ＭＳ Ｐゴシック", "Osaka", "FontAwesome", sans-serif;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+      text-indent: 0;
+    }
+
+    ul.dotted_disc {
+      list-style: disc;
+    }
+
+    ul.colored_list_margin {
+      margin-left: 3em;
+    }
+
+    li.li_clickable:hover {
+      background: #a0d3ff;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    hr.hr_gray {
+      border: 0;
+      height: 1px;
+      background: #CCC;
+    }
+
+    a img {
+      border-style: none;
+    }
+
+    /* calacter settings */
+
+    .color_blue {
+      color: #003399;
+    }
+
+    .color_red {
+      color: #ff0000;
+    }
+
+    .color_darkgray {
+      color: #333;
+    }
+
+    .color_lightblue {
+      color: #45b4fc;
+    }
+
+    .underline {
+      text-decoration: underline;
+    }
+
+    .font_large {
+      font-size: 24px;
+    }
+
+    .font_small {
+      font-size: 12px;
+    }
+
+    /* position settings */
+
+    .middle_center {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .top_center {
+      vertical-align: top;
+      text-align: center;
+    }
+
+    .top_left {
+      vertical-align: top;
+      text-align: left;
+    }
+
+    /* icon settings */
+
+    .fa-blue:before {
+      color: #003399;
+    }
+
+    .fa-saxeblue:before {
+      color: #237793;
+    }
+
+    .fa-lightblue:before {
+      color: #45b4fc;
+    }
+
+    .fa-red:before {
+      color: #c61130;
+    }
+
+    .fa-lightgreen:before {
+      color: #61dab3;
+    }
+
+    .fa-darkgray:before {
+      color: #333;
+    }
+
+    /* table settings */
+
+    table.tbl_catalog {
+      width: 100%;
+      height: 100%;
+      table-layout: fixed;
+      margin: 10px 0px 15px;
+      border-spacing: 0;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      /* 後方互換 */
+    }
+
+    table.tbl_catalog th {
+      padding: 8px 2px;
+      color: #fff;
+      font-weight: bold;
+      background: #1447ad;
+      border-left: 1px solid #003399;
+      border-top: 1px solid #003399;
+      border-bottom: 1px solid #003399;
+      line-height: 120%;
+      text-align: center;
+      box-shadow: 0px 1px 1px rgba(255, 255, 255, 0.3) inset;
+    }
+
+    table.tbl_catalog th:last-child {
+      border-right: 1px solid #003399;
+      box-shadow: 2px 0 1px rgba(0, 0, 0, 0.1), 0px 1px 1px rgba(255, 255, 255, 0.3) inset;
+    }
+
+    table.tbl_catalog tr td {
+      height: 100%;
+      padding: 8px 2px;
+      color: #000;
+      border-bottom: 1px solid #84b2e0;
+      border-left: 1px solid #84b2e0;
+    }
+
+    table.tbl_catalog tr td:last-child {
+      border-right: 1px solid #84b2e0;
+      box-shadow: 2px 0 1px rgba(236, 64, 64, 0.1);
+    }
+
+    table.tbl_catalog tr:nth-child(2n) {
+      background: #fff;
+    }
+
+    table.tbl_catalog tr:nth-child(2n+1) {
+      background: #e4f0ff;
+    }
+
+    table.tbl_catalog tr:last-child td {
+      box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    table.tbl_catalog tr:hover {
+      background: #a0d3ff;
+      cursor: pointer;
+    }
+
+    /* table column width */
+
+    .tbl_catalog_col1 {
+      /* ユーザ名 */
+      width: 4%;
+    }
+
+    .tbl_catalog_col2 {
+      /* 拠点名 */
+      width: 4%;
+    }
+
+    .tbl_catalog_col3 {
+      /* 接続形態 */
+      width: 5%;
+    }
+
+    .tbl_catalog_col4 {
+      /* 拠点構成 */
+      width: 3%;
+    }
+
+    .tbl_catalog_col5 {
+      /* 正系品目 */
+      width: 3%;
+    }
+
+    .tbl_catalog_col6 {
+      /* 副系品目 */
+      width: 3%;
+    }
+
+    .tbl_catalog_col7 {
+      /* 住所 */
+      width: 4%;
+    }
+
+    .tbl_catalog_col8 {
+      /* ビル */
+      width: 4%;
+    }
+
+    .tbl_catalog_col9 {
+      /* フロア */
+      width: 2%;
+    }
+
+    .tbl_catalog_col10 {
+      /* IPアドレス */
+      width: 5%;
+    }
+
+    .tbl_catalog_col11 {
+      /* 設置機器 */
+      width: 5%;
+    }
+
+    .tbl_catalog_col12 {
+      /* 正系回線 */
+      width: 7%;
+    }
+
+    .tbl_catalog_col13 {
+      /* 副系回線 */
+      width: 7%;
+    }
+
+    .tbl_catalog_col15 {
+      /* 備考 */
+      width: 4%;
+    }
+
+    .tbl_catalog_col14 {
+      /* 備考 */
+      width: 6%;
+    }
+
+    /* table sort icon */
+
+    table.tbl_catalog thead tr th.headerSortUp:after,
+    table.tbl_catalog thead tr th.headerSortDown:after,
+    table.tbl_catalog thead tr th.header:after {
+      font-family: FontAwesome;
+      /* for IE8 */
+      margin-left: 2px;
+    }
+
+    table.tbl_catalog thead tr th.header:after {
+      content: "\f0dc";
+    }
+
+    table.tbl_catalog thead tr th.headerSortUp:after {
+      content: "\f0de";
+    }
+
+    table.tbl_catalog thead tr th.headerSortDown:after {
+      content: "\f0dd";
+    }
+
+    /* custom input-box */
+
+    .custom_input {
+      width: 260px;
+      height: 22px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      overflow: hidden;
+      position: relative;
+      display: block;
+    }
+
+    /* custom select-box */
+
+    .custom_select {
+      width: 260px;
+      height: 22px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      overflow: hidden;
+      position: relative;
+      display: block;
+    }
+
+    .custom_select:after {
+      width: 10%;
+      height: 100%;
+      padding: 5px 8px;
+      position: absolute;
+      right: 5px;
+      top: 0;
+      z-index: 1;
+      content: "\f13a";
+      font-family: FontAwesome;
+      text-align: center;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+
+    .custom_select select {
+      color: #333;
+      font-family: "Meiryo UI", "Meiryo";
+      height: 22px;
+      padding: 2px;
+      right: 5px;
+      border: 0;
+      width: 130%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    .styled-select select::-ms-expand {
+      display: none;
+    }
+
+    /* id */
+
+    #rule1,
+    #rule2,
+    #rule3 {
+      display: none;
+      margin-top: 5px;
+    }
+
+    #scroll-to-top {
+      position: fixed;
+      z-index: 2147483647;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.75);
+      text-decoration: none;
+    }
+
+    #contents {
+      margin: 10px 0;
+      padding: 20px 0;
+      background: #eee;
+    }
+
+    #description_area {
+      max-width: 960px;
+      margin: 0 auto;
+      text-align: center;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      /* 後方互換 */
+    }
+
+    #desc_introduction {
+      max-width: 680px;
+      text-align: left;
+      margin: 0 auto 20px;
+    }
+
+    #desc_introduction p {
+      width: 100%;
+    }
+
+    #desc_rules {
+      padding: 10px;
+      background: #fff;
+      text-align: left;
+    }
+
+    #footer {
+      width: 100%;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* others */
+
+    .exclamation {
+      margin-top: 10px;
+      margin-left: 10px;
+      padding: 5px 0;
+      max-width: 920px;
+    }
+
+    .release_process_pic {
+      width: 270px;
+      height: 130px;
+      margin-bottom: 5px;
+    }
+
+    /*]]>*/
+  </style>
+
+  <!-- Header -->
+  <div id="header" style="width: 100%;">
+    <div style="float: left;">
+      <p>
+        <strong class="color_blue font_large" style="margin-left: 10px;">
+          <i class="fa fa-themeisle"></i> ネットワーク接続拠点一覧</strong>
+      </p>
+    </div>
+    <div style="clear: both;"></div>
+  </div>
+
+  <!-- Contents -->
+  <div id="app">
+    <div id="contents">
+      <div id="description_area">
+        <div id="desc_rules">
+          <ul>
+            <li class="color_blue li_clickable" onClick="display_rule('rule1')">
+              <i class="fa fa-info-circle fa-lg" aria-hidden="true" style="margin-right: 10px;"></i>
+              <strong>ご利用時の注意点</strong>
+            </li>
+          </ul>
+          <div id="rule1">
+            <ul>
+              <li>本サイトの情報は、各種維持管理資料から持ってきたものです。</li>
+              <div class="exclamation" style="clear: both; background: #ffffd9;">
+                <i class="fa fa-exclamation-triangle fa-red fa-lg" aria-hidden="true" style="margin: 0 10px 0 10px;"></i>
+                <strong class="color_red">更新は手動で行われているため、情報が最新版で無い場合があります。ご注意ください！</strong>
+              </div>
+            </ul>
+          </div>
+          <hr class="hr_gray">
+          <ul>
+            <li class="color_blue li_clickable" onClick="display_rule('rule2')">
+              <i class="fa fa-info-circle fa-lg" aria-hidden="true" style="margin-right: 10px;"></i>
+              <strong>便利な使い方＜ユーザフィルタ・全文検索＞</strong>
+            </li>
+          </ul>
+          <div id="rule2">
+            <ul class="dotted_disc colored_list_margin">
+              <li>ユーザフィルタ
+                <div>ユーザフィルタで表示するユーザを限定することができます。ユーザフィルタのプルダウンよりユーザを選択してください。</div>
+              </li>
+              <li>全文検索
+                <div>表の各項目から全文検索欄に入力した文字列が含まれる行を検索することができます。全文検索欄に検索したい文字を入力してください</div>
+              </li>
+            </ul>
+          </div>
+          <hr class="hr_gray">
+          <ul>
+            <li class="color_blue li_clickable" onClick="display_rule('rule3')">
+              <i class="fa fa-info-circle fa-lg" aria-hidden="true" style="margin-right: 10px;"></i>
+              <strong>更新履歴</strong>
+            </li>
+          </ul>
+          <div id="rule3">
+            <ul class="dotted_disc colored_list_margin">
+              <li v-for="log in changelog">[{{ log.date }}] [{{ log.category }}] {{ log.content }} </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div id="filter_area">
+      <div style="float: left; margin-top: 10px;">
+        <i class="fa fa-filter fa-darkgray" aria-hidden="true" style="margin-right: 2px;"></i>
+        <label for="cat_filter">
+          <strong>ユーザフィルタ：</strong>
+        </label>
+      </div>
+      <div style="float: left">
+        <label class="custom_select">
+          <select id="cat_filter">
+            <option v-for="user in userlist" v-bind:value="user.userid">{{ user.userid }}（{{ user.username }}）</option>
+          </select>
+        </label>
+      </div>
+      <div style="float: left; margin-top: 10px; margin-left: 40px; ">
+        <i class="fa fa-search fa-darkgray" aria-hidden="true" style="margin-right: 2px;"></i>
+        <strong>全文検索：</strong>
+      </div>
+      <div style="float: left">
+        <form>
+          <input type="text" v-model="searchText" class="custom_input" placeholder="検索する文字列を入力してください" />
+        </form>
+      </div>
+      <div style="float: right;">
+        <div style="float: right;">
+          <p>参照日：
+            <i class="fa fa-calendar fa-darkgray" aria-hidden="true" style="margin-right: 5px;"></i>{{ systemdate }}</p>
+        </div>
+        <div style="clear: both;"></div>
+        <div style="float: right;">
+          <p>最終更新日：
+            <i class="fa fa-refresh fa-spin fa-darkgray" aria-hidden="true" style="margin-right: 5px;"></i>{{ lastmodifieddate }}</p>
+        </div>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+
+    <!-- Catalogs -->
+    <table id="branch_list_tbl" class="tbl_catalog font_small">
+      <colgroup>
+        <col class="tbl_catalog_col1">
+        <col class="tbl_catalog_col2">
+        <col class="tbl_catalog_col3">
+        <col class="tbl_catalog_col4">
+        <col class="tbl_catalog_col5">
+        <col class="tbl_catalog_col6">
+        <col class="tbl_catalog_col7">
+        <col class="tbl_catalog_col8">
+        <col class="tbl_catalog_col9">
+        <col class="tbl_catalog_col10">
+        <col class="tbl_catalog_col11">
+        <col class="tbl_catalog_col12">
+        <col class="tbl_catalog_col13">
+        <col class="tbl_catalog_col14">
+        <col class="tbl_catalog_col15">
+      </colgroup>
+      <thead>
+        <tr>
+          <th rowspan="2">ユーザ名</th>
+          <th rowspan="2">拠点名</th>
+          <th colspan="4">提供内容</th>
+          <th colspan="3">提供先</th>
+          <th rowspan="2">接続先IPアドレス</th>
+          <th rowspan="2">設置機器</th>
+          <th rowspan="2">正系回線</th>
+          <th rowspan="2">副系回線</th>
+          <th rowspan="2">維持管理資料</th>
+          <th rowspan="2">備考</th>
+        </tr>
+        <tr>
+          <th>提供形態</th>
+          <th>拠点構成</th>
+          <th>正系品目</th>
+          <th>副系品目</th>
+          <th>住所</th>
+          <th>ビル</th>
+          <th>フロア</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="branch in filteredBranchList" v-bind:title="branch.userid">
+          <td class="top_left" title="ユーザ名">{{ branch.username }}<br/>【{{ branch.usercode }}】</td>
+          <td class="top_left" title="拠点名">{{ branch.branchname }}</td>
+          <td class="top_left" title="提供形態">{{ branch.networkproperty.service }}</td>
+          <td class="top_left" title="接続構成">{{ branch.networkproperty.pattern }}</td>
+          <td class="top_left" title="正系品目">{{ branch.networkproperty.primarynetwork }}</td>
+          <td class="top_left" title="副系品目">{{ branch.networkproperty.secondarynetwork }}</td>
+          <td class="top_left" title="住所">
+            <a v-bind:href="'https://www.google.com/maps/search/' + branch.branchproperty.address" target="_blank">
+              <i class="fa fa-location-arrow"></i>{{ branch.branchproperty.address }}</a>
+          </td>
+          <td class="top_left" title="ビル">{{ branch.branchproperty.building }}</td>
+          <td class="top_left" title="フロア">{{ branch.branchproperty.floor }}</td>
+          <td class="top_left" title="接続先IPアドレス">
+            <ul>
+              <li v-for="ipaddr in branch.ipaddress">{{ ipaddr }}</li>
+            </ul>
+          </td>
+          <td class="top_left" title="設置機器">
+            <ul>
+              <li v-for="device in branch.devices">{{ device }}</li>
+            </ul>
+          </td>
+          <td class="top_left" title="正系回線">
+            <ul>
+              <li>
+                <i class="fa fa-user"></i> {{ branch.primarynetworkproperty.provider }}</li>
+              <li>
+                <i class="fa fa-cloud"></i> {{ branch.primarynetworkproperty.service }}</li>
+              <li>
+                <i class="fa fa-info-circle"></i> {{ branch.primarynetworkproperty.id }}</li>
+              <li>
+                <i class="fa fa-tachometer"></i> {{ branch.primarynetworkproperty.type }}</li>
+              <li>
+                <i class="fa fa-calendar"></i> {{ branch.primarynetworkproperty.startdate }}</li>
+            </ul>
+          </td>
+          <td class="top_left" title="副系回線">
+            <ul>
+              <li>
+                <i class="fa fa-user"></i> {{ branch.secondarynetworkproperty.provider }}</li>
+              <li>
+                <i class="fa fa-cloud"></i> {{ branch.secondarynetworkproperty.service }}</li>
+              <li>
+                <i class="fa fa-info-circle"></i> {{ branch.secondarynetworkproperty.id }}</li>
+              <li>
+                <i class="fa fa-tachometer"></i> {{ branch.secondarynetworkproperty.type }}</li>
+              <li>
+                <i class="fa fa-calendar"></i> {{ branch.secondarynetworkproperty.startdate }}</li>
+            </ul>
+          </td>
+          <td class="top_left" title="維持管理資料">
+            <ul v-for="file in branch.files">
+              <li>
+                <a v-bind:title="file.filename" v-bind:href="file.filepath" target="_blank">
+                  <i class="fa fa-file-text fa-saxeblue" aria-hidden="true"></i> {{ file.filename }}</a>
+              </li>
+            </ul>
+          </td>
+          <td class="top_left" title="備考">{{ branch.note }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer" class="font_small">
+    <!-- Scroll Button -->
+    <a href="#" id="scroll-to-top">
+      <ul style="text-align: center;">
+        <li>
+          <i class="fa fa-angle-double-up fa-lg" aria-hidden="true"></i>
+        </li>
+        <li>PAGE TOP</li>
+      </ul>
+    </a>
+  </div>
+
+  <!-- Vue.js Scripts -->
+  <script type="text/javascript">
+    var date = new Date();
+    var vm = new Vue({
+      el: "#app",
+      data: {
+        searchText: "",
+        lastmodifieddate: "",
+        systemdate: date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate(),
+        branchlist: [],
+        userlist: [],
+        changelog: []
+      },
+      mounted: function () {
+        axios.get("./branchlist.json").then(function (response) {
+          vm.lastmodifieddate = response.data.lastmodifieddate;
+          vm.branchlist = response.data.branchlist;
+          vm.userlist = response.data.userlist; vm.userlist.unshift({"userid": "", "username": "全ユーザ表示"});
+          vm.changelog = response.data.changelog.slice().reverse();
+        }).catch(function (error) { console.log(error); });
+      },
+      computed: {
+        filteredBranchList: function () {
+          return this.branchlist.filter(function (branch) {
+            return (JSON.stringify(branch).toLowerCase().indexOf(vm.searchText.toLowerCase()) != -1);
+          });
+        }
+      }
+    });
+  </script>
+
+  <!-- JQuery Plugins -->
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+
+  <!-- Scripts -->
+  <script type="text/javascript">
+    //スクロールボタン
+    $('#scroll-to-top').hide();
+    $(window).scroll(function () {
+      if ($(this).scrollTop() > 100) {
+        $('#scroll-to-top').fadeIn();
+      } else {
+        $('#scroll-to-top').fadeOut();
+      }
+    });
+    $('#scroll-to-top').click(function () {
+      $('html,body').animate({
+        scrollTop: 0
+      }, 300);
+      return false;
+    });
+    //カテゴリフィルタ(Event:change)
+    var fil = document.getElementById('cat_filter');
+    if (fil.addEventListener) {
+      // for modern browser
+      fil.addEventListener('change', filterChangeEventHandler, false);
+    } else if (fil.attachEvent) {
+      // for ~IE8
+      fil.attachEvent('onchange', filterChangeEventHandler);
+    } else {
+      fil.onchange = fil.options[fil.selectedIndex].value;
+    }
+    function filterChangeEventHandler(event) {
+      if (event.target) {
+        tblfilter('branch_list_tbl', event.target.options[event.target.selectedIndex].value);
+      } else {
+        var evt = event || window.event;
+        if (evt.srcElement) {
+          tblfilter('branch_list_tbl', evt.srcElement.options[evt.srcElement.selectedIndex].value);
+        }
+      }
+    }
+    //カテゴリフィルタ切替時処理
+    function tblfilter(nm, key) {
+      if (!document.getElementsByTagName) return;
+      var trs = document.getElementById(nm).rows;
+      for (var i = 0; i < trs.length; i++) {
+        var tr = trs[i];
+        if (!tr.title || tr.title == '') continue;
+        var found = 0;
+        if (key == '') found = 1;
+        else {
+          var keys = tr.title.split(',');
+          for (var j = 0; j < keys.length; j++) {
+            if (keys[j] == key) { found = 1; break; }
+          }
+        }
+        tr.style.display = found ? '' : 'none';
+      }
+    }
+    //説明文言表示切替 
+    function display_rule(id) {
+      var disp_obj = document.getElementById(id).style.display;
+      var display_state;
+      if (disp_obj == null || disp_obj == "block") {
+        display_state = "none";
+      } else {
+        display_state = "block";
+      }
+      document.getElementById(id).style.display = display_state;
+    }
+  </script>
+
+</body>
+
+</html>
